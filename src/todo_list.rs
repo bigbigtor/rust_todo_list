@@ -4,25 +4,25 @@ use std::fmt;
 use termion::color::*;
 use crate::todo::Todo;
 
-pub struct TodoList<'a> {
-    todos: &'a Vec<Todo>,
+pub struct TodoList {
+    todos: Vec<Todo>,
     selected_index: usize,
 }
 
-impl<'a> TodoList<'a> {
-    pub fn new() -> TodoList<'a> {
+impl TodoList {
+    pub fn new() -> TodoList {
         TodoList {
-            todos: &mut Vec::new(),
+            todos: Vec::new(),
             selected_index: 0,
         }
     }
 
-    pub fn add(&self, todo: Todo) {
+    pub fn add(&mut self, todo: Todo) {
         self.todos.push(todo);
     }
 }
 
-impl<'a> fmt::Display for TodoList<'a> {
+impl fmt::Display for TodoList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s: Vec<String> = self.todos
                     .iter()

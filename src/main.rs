@@ -13,7 +13,7 @@ fn main() {
     //let mut stdout = stdout().into_raw_mode().unwrap();
     let todo = todo::Todo::new(String::from("hola"));
     let todo = todo.complete();
-    let todo_list = todo_list::TodoList::new();
+    let mut todo_list = todo_list::TodoList::new();
     todo_list.add(todo);
     println!("{}", todo_list);
 
