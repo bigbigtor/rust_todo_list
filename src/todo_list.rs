@@ -21,21 +21,21 @@ impl TodoList {
         self.todos.push(todo);
     }
 
-    pub fn set_selected_index(&mut self, idx: usize) {
-        self.selected_index = idx;
-    }
-
-    pub fn get_selected_index(&self) -> usize {
-        self.selected_index
-    }
-
-    pub fn get_len(&self) -> usize {
-        self.todos.len()
-    }
-
     pub fn toggle_selected_todo(&mut self) {
         let todo = self.todos[self.selected_index].toggle_complete();
         self.todos[self.selected_index] = todo;
+    }
+
+    pub fn select_previous_todo(&mut self) {
+        if self.selected_index < (self.todos.len() - 1) {
+            self.selected_index += 1;
+        }
+    }
+
+    pub fn select_next_todo(&mut self) {
+        if 0 < self.selected_index {
+            self.selected_index -= 1;
+        }
     }
 }
 

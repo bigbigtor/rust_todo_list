@@ -32,20 +32,9 @@ fn main() {
     for c in stdin.keys() {
         match c.unwrap() {
             Key::Char('q') => break,
-            Key::Esc => println!("ESC"),
-            Key::Char('j') => {
-                if todo_list.get_selected_index() < (todo_list.get_len() - 1) {
-                    todo_list.set_selected_index(todo_list.get_selected_index() + 1);
-                }
-            },
-            Key::Char('k') => {
-                if 0 < todo_list.get_selected_index() {
-                    todo_list.set_selected_index(todo_list.get_selected_index() - 1);
-                }
-            },
-            Key::Char('t') => {
-                todo_list.toggle_selected_todo();
-            },
+            Key::Char('j') => todo_list.select_previous_todo(),
+            Key::Char('k') => todo_list.select_next_todo(),
+            Key::Char('t') => todo_list.toggle_selected_todo(),
             _ => {}
         }
         stdout.flush().unwrap();
@@ -62,8 +51,9 @@ fn main() {
 
     write!(
         stdout,
-        "{}{}", 
+        "{}{}{}", 
         termion::clear::All,
         termion::cursor::Goto(1, 1),
+        termion::cursor::Show,
     ).unwrap();
 }
