@@ -32,6 +32,11 @@ impl TodoList {
     pub fn get_len(&self) -> usize {
         self.todos.len()
     }
+
+    pub fn toggle_selected_todo(&mut self) {
+        let todo = self.todos[self.selected_index].toggle_complete();
+        self.todos[self.selected_index] = todo;
+    }
 }
 
 impl fmt::Display for TodoList {

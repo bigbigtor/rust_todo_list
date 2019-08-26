@@ -14,7 +14,7 @@ fn main() {
     let todo = todo::Todo::new(String::from("hola"));
     let todo2 = todo::Todo::new(String::from("macaco"));
     let todo3 = todo::Todo::new(String::from("do selva"));
-    let todo = todo.complete();
+    let todo = todo.toggle_complete();
     let mut todo_list = todo_list::TodoList::new();
     todo_list.add(todo);
     todo_list.add(todo2);
@@ -22,10 +22,9 @@ fn main() {
 
     write!(
         stdout,
-        "{}{}TODO LIST\n\r{}{}",
+        "{}{}TODO LIST\n\r{}",
         termion::clear::All,
         termion::cursor::Goto(1, 1),
-        termion::cursor::Hide,
         todo_list
     ).unwrap();
     stdout.flush().unwrap();
@@ -44,16 +43,18 @@ fn main() {
                     todo_list.set_selected_index(todo_list.get_selected_index() - 1);
                 }
             },
+            Key::Char('t') => {
+                todo_list.toggle_selected_todo();
+            },
             _ => {}
         }
         stdout.flush().unwrap();
 
         write!(
             stdout,
-            "{}{}TODO LIST\n\r{}{}",
+            "{}{}TODO LIST\n\r{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1),
-            termion::cursor::Hide,
             todo_list
         ).unwrap();
 

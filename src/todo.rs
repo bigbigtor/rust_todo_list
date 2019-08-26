@@ -14,10 +14,10 @@ impl Todo {
         }
     }
 
-    pub fn complete(&self) -> Todo {
+    pub fn toggle_complete(&self) -> Todo {
         Todo {
             description: self.description.to_owned(),
-            completed: true,
+            completed: !self.completed,
         }
     }
 }
