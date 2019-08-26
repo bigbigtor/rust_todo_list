@@ -12,9 +12,13 @@ fn main() {
     //let stdin = stdin();
     //let mut stdout = stdout().into_raw_mode().unwrap();
     let todo = todo::Todo::new(String::from("hola"));
+    let todo2 = todo::Todo::new(String::from("macaco"));
+    let todo3 = todo::Todo::new(String::from("do selva"));
     let todo = todo.complete();
     let mut todo_list = todo_list::TodoList::new();
     todo_list.add(todo);
+    todo_list.add(todo2);
+    todo_list.add(todo3);
     println!("{}", todo_list);
 
     //write!(

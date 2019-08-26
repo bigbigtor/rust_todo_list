@@ -24,16 +24,18 @@ impl TodoList {
 
 impl fmt::Display for TodoList {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s: Vec<String> = self.todos
+        let s = self.todos
                     .iter()
                     .enumerate()
                     .map(|(pos, todo)| {
                         if pos == self.selected_index {
                             format!("{}{}{}", Fg(Black), Bg(White), todo)
                         } else {
-                            format!("{}", todo)
+                            format!("{}{}{}", Fg(Reset), Bg(Reset), todo)
                         }
-                    }).collect();
-        write!(f, "{}", s.concat())
+                    })
+                    .collect::<Vec<String>>()
+                    .join("\n\r");
+        write!(f, "{}", s)
     }
 }
