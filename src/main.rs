@@ -19,30 +19,23 @@ fn main() {
     todo_list.add(todo);
     todo_list.add(todo2);
     todo_list.add(todo3);
-    println!("{}", todo_list);
 
-    //write!(
-    //    stdout,
-    //    "{}{}TODO LIST{}",
-    //    termion::clear::All,
-    //    termion::cursor::Goto(1, 1),
-    //    termion::cursor::Hide
-    //).unwrap();
-    //stdout.flush().unwrap();
+    write!(
+        stdout,
+        "{}{}TODO LIST\n\r{}{}",
+        termion::clear::All,
+        termion::cursor::Goto(1, 1),
+        termion::cursor::Hide,
+        todo_list
+    ).unwrap();
+    stdout.flush().unwrap();
 
     for c in stdin.keys() {
-        write!(
-            stdout,
-            "{}{}",
-            termion::cursor::Goto(1, 1),
-            termion::clear::CurrentLine
-        ).unwrap();
-
         match c.unwrap() {
             Key::Char('q') => break,
             Key::Esc => println!("ESC"),
             Key::Char('j') => {
-                if todo_list.get_selected_index() < todo_list.get_len() {
+                if todo_list.get_selected_index() < (todo_list.get_len() - 1) {
                     todo_list.set_selected_index(todo_list.get_selected_index() + 1);
                 }
             },
@@ -54,9 +47,22 @@ fn main() {
             _ => {}
         }
         stdout.flush().unwrap();
-        write!(stdout, "{}", todo_list);
+
+        write!(
+            stdout,
+            "{}{}TODO LIST\n\r{}{}",
+            termion::clear::All,
+            termion::cursor::Goto(1, 1),
+            termion::cursor::Hide,
+            todo_list
+        ).unwrap();
 
     }
 
-    write!(stdout, "{}", termion::cursor::Show).unwrap();
+    write!(
+        stdout,
+        "{}{}", 
+        termion::clear::All,
+        termion::cursor::Goto(1, 1),
+    ).unwrap();
 }

@@ -41,9 +41,9 @@ impl fmt::Display for TodoList {
                     .enumerate()
                     .map(|(pos, todo)| {
                         if pos == self.selected_index {
-                            format!("{}{}{}", Fg(Black), Bg(White), todo)
+                            format!("{}{}{}{}{}", Fg(Black), Bg(White), todo, Fg(Reset), Bg(Reset))
                         } else {
-                            format!("{}{}{}", Fg(Reset), Bg(Reset), todo)
+                            format!("{}", todo)
                         }
                     })
                     .collect::<Vec<String>>()
