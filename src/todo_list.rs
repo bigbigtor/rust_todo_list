@@ -20,6 +20,18 @@ impl TodoList {
     pub fn add(&mut self, todo: Todo) {
         self.todos.push(todo);
     }
+
+    pub fn set_selected_index(&mut self, idx: usize) {
+        self.selected_index = idx;
+    }
+
+    pub fn get_selected_index(&self) -> usize {
+        self.selected_index
+    }
+
+    pub fn get_len(&self) -> usize {
+        self.todos.len()
+    }
 }
 
 impl fmt::Display for TodoList {
