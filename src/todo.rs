@@ -20,6 +20,12 @@ impl Todo {
             completed: !self.completed,
         }
     }
+
+    pub fn build_from_storage(line: &str) -> Todo {
+       let (completed, description) = line.split_at(1);
+       let completed = if completed == "1" { true } else { false };
+       Todo::new(description.to_owned(), completed)
+    }
 }
 
 impl fmt::Display for Todo {
