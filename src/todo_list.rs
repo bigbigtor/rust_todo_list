@@ -52,7 +52,7 @@ impl fmt::Display for TodoList {
                         }
                     })
                     .collect::<Vec<String>>()
-                    .join("\n\r");
+                    .join("\r\n");
         write!(f, "{}", s)
     }
 }

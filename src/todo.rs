@@ -7,10 +7,10 @@ pub struct Todo {
 }
 
 impl Todo {
-    pub fn new(desc: String) -> Todo {
+    pub fn new(desc: String, comp: bool) -> Todo {
         Todo {
             description: desc,
-            completed: false,
+            completed: comp,
         }
     }
 
