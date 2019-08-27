@@ -18,9 +18,10 @@ fn main() {
 
     write!(
         stdout,
-        "{}{}TODO LIST\n\r{}",
+        "{}{}{}TODO LIST\n\r{}",
         termion::clear::All,
         termion::cursor::Goto(1, 1),
+        termion::cursor::Hide,
         todo_list
     ).unwrap();
     stdout.flush().unwrap();
@@ -37,9 +38,10 @@ fn main() {
 
         write!(
             stdout,
-            "{}{}TODO LIST\n\r{}",
+            "{}{}{}TODO LIST\n\r{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1),
+            termion::cursor::Hide,
             todo_list
         ).unwrap();
 
