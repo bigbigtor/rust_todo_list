@@ -1,57 +1,62 @@
 extern crate termion;
+extern crate tui;
 
-use termion::event::Key;
-use termion::input::TermRead;
+//use termion::event::Key;
+//use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-use std::io::{Write, stdout, stdin};
+//use termion::screen::AlternateScreen;
+use termion::input::MouseTerminal;
+use std::io::{/*Write,*/ stdout, stdin, Error};
+use tui::Terminal;
+use tui::layout::{Constraint, Direction, Layout};
+use tui::backend::TermionBackend;
+use tui::widgets::{Widget, Block, Borders, SelectableList};
+use tui::style::*;
 
 mod todo;
-mod todo_list;
+mod handler;
+mod app_state;
 mod storage;
 
-fn main() {
-    let mut todo_list = todo_list::TodoList::new();
-    storage::load_from_file(&mut todo_list);
+fn main() -> Result<(), Error> {
+    let mut app_state = app_state::AppState::new();
+    let handler = handler::Handler::new(&app_state);
+    storage::load_from_file(&mut app_state)?;
     let stdin = stdin();
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    let stdout = stdout().into_raw_mode()?;
+    let stdout = MouseTerminal::from(stdout);
+//    let stdout = AlternateScreen::from(stdout);
+    let backend = TermionBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    terminal.hide_cursor()?;
+    for k in stdin.keys() {
 
-    write!(
-        stdout,
-        "{}{}{}TODO LIST\n\r{}",
-        termion::clear::All,
-        termion::cursor::Goto(1, 1),
-        termion::cursor::Hide,
-        todo_list
-    ).unwrap();
-    stdout.flush().unwrap();
-
-    for c in stdin.keys() {
-        match c.unwrap() {
-            Key::Char('q') => break,
-            Key::Char('j') => todo_list.select_previous_todo(),
-            Key::Char('k') => todo_list.select_next_todo(),
-            Key::Char('t') => todo_list.toggle_selected_todo(),
-            _ => {}
-        }
-        stdout.flush().unwrap();
-
-        write!(
-            stdout,
-            "{}{}{}TODO LIST\n\r{}",
-            termion::clear::All,
-            termion::cursor::Goto(1, 1),
-            termion::cursor::Hide,
-            todo_list
-        ).unwrap();
-
+        terminal.draw(|mut f| {
+            let chunks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([
+                    Constraint::Percentage(80),
+                    Constraint::Percentage(20)
+                ].as_ref())
+                .split(f.size());
+            SelectableList::default()
+                .block(Block::default().title("TO-DO LIST").borders(Borders::ALL))
+                .items(
+                    &todo_list.iter()
+                              .map(|t| format!("{}", t))
+                              .collect::<Vec<String>>()
+                )
+                .select(Some(1))
+                .style(Style::default().fg(Color::White))
+                .highlight_style(Style::default().modifier(Modifier::ITALIC))
+                .highlight_symbol(">>")
+                .render(&mut f, chunks[0]);
+            Block::default()
+                .title("info")
+                .borders(Borders::ALL)
+                .render(&mut f, chunks[1]);
+        })?;
     }
-    storage::save_to_file(&todo_list);
-
-    write!(
-        stdout,
-        "{}{}{}",
-        termion::clear::All,
-        termion::cursor::Goto(1, 1),
-        termion::cursor::Show,
-    ).unwrap();
+    storage::save_to_file(&app_state)?;
+    Ok(())
 }

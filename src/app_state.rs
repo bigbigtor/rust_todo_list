@@ -1,17 +1,13 @@
-extern crate termion;
-
-use std::fmt;
-use termion::color::*;
 use crate::todo::Todo;
 
-pub struct TodoList {
+pub struct AppState {
     todos: Vec<Todo>,
     selected_index: usize,
 }
 
-impl TodoList {
-    pub fn new() -> TodoList {
-        TodoList {
+impl AppState {
+    pub fn new() -> AppState {
+        AppState {
             todos: Vec::new(),
             selected_index: 0,
         }
@@ -43,23 +39,5 @@ impl TodoList {
                   .map(|todo| todo.to_storage_line())
                   .collect::<Vec<String>>()
                   .join("\r\n")
-    }
-}
-
-impl fmt::Display for TodoList {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s = self.todos
-                    .iter()
-                    .enumerate()
-                    .map(|(pos, todo)| {
-                        if pos == self.selected_index {
-                            format!("{}{}{}{}{}", Fg(Black), Bg(White), todo, Fg(Reset), Bg(Reset))
-                        } else {
-                            format!("{}", todo)
-                        }
-                    })
-                    .collect::<Vec<String>>()
-                    .join("\r\n");
-        write!(f, "{}", s)
     }
 }
