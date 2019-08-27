@@ -37,6 +37,13 @@ impl TodoList {
             self.selected_index -= 1;
         }
     }
+
+    pub fn to_storage_content(&self) -> String {
+        self.todos.iter()
+                  .map(|todo| todo.to_storage_line())
+                  .collect::<Vec<String>>()
+                  .join("\r\n")
+    }
 }
 
 impl fmt::Display for TodoList {

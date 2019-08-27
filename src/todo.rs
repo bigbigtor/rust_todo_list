@@ -26,6 +26,11 @@ impl Todo {
        let completed = if completed == "1" { true } else { false };
        Todo::new(description.to_owned(), completed)
     }
+
+    pub fn to_storage_line(&self) -> String {
+        let comp = if self.completed { "1" } else { "0" };
+        comp.to_owned() + &self.description
+    }
 }
 
 impl fmt::Display for Todo {

@@ -45,6 +45,7 @@ fn main() {
         ).unwrap();
 
     }
+    storage::save_to_file(&todo_list);
 
     write!(
         stdout,
