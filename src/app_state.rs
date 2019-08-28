@@ -2,6 +2,7 @@ extern crate dirs;
 
 use std::fs;
 use std::io;
+use termion::event::Key;
 use crate::todo::Todo;
 
 pub struct AppState {
@@ -21,18 +22,18 @@ impl AppState {
         self.todos.push(todo);
     }
 
-    pub fn toggle_selected_todo(&mut self) {
+    fn toggle_selected_todo(&mut self) {
         let todo = self.todos[self.selected_index].toggle_complete();
         self.todos[self.selected_index] = todo;
     }
 
-    pub fn select_previous_todo(&mut self) {
+    fn select_previous_todo(&mut self) {
         if self.selected_index < (self.todos.len() - 1) {
             self.selected_index += 1;
         }
     }
 
-    pub fn select_next_todo(&mut self) {
+    fn select_next_todo(&mut self) {
         if 0 < self.selected_index {
             self.selected_index -= 1;
         }
@@ -42,6 +43,10 @@ impl AppState {
         self.todos.iter()
                   .map(|t| format!("{}", t))
                   .collect::<Vec<String>>()
+    }
+
+    pub fn get_selected_index(&self) -> usize {
+        self.selected_index
     }
 
     pub fn load(&mut self) -> io::Result<()> {
@@ -65,4 +70,14 @@ impl AppState {
         fs::write(todo_file_path, content)?;
         Ok(())
     }
+
+    pub fn handle_event(&mut self, key: Key) {
+        match key {
+            Key::Char('j') => self.select_previous_todo(),
+            Key::Char('k') => self.select_next_todo(),
+            Key::Char('t') => self.toggle_selected_todo(),
+            _ => {}
+        }
+    }
+
 }
