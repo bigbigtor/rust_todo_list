@@ -7,8 +7,9 @@ use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 use termion::input::MouseTerminal;
 use std::io::{stdout, stdin, Error};
-use tui::Terminal;
-use tui::layout::{Constraint, Direction, Layout};
+use tui::{Terminal, Frame};
+use tui::backend::Backend;
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::backend::TermionBackend;
 use tui::widgets::{Widget, Block, Borders, SelectableList};
 use tui::style::*;
@@ -30,7 +31,6 @@ fn main() -> Result<(), Error> {
     for k in stdin.keys() {
         if let Ok(Key::Char('q')) = k { break };
         app_state.handle_event(k.unwrap());
-        let items = app_state.to_string_list();
         terminal.draw(|mut f| {
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
@@ -39,17 +39,7 @@ fn main() -> Result<(), Error> {
                     Constraint::Percentage(20)
                 ].as_ref())
                 .split(f.size());
-            SelectableList::default()
-                .block(Block::default().title("TO-DO LIST").borders(Borders::ALL))
-                .items(&items)
-                .select(Some(app_state.get_selected_index()))
-                .style(Style::default().fg(Color::White))
-                .highlight_style(
-                    Style::default()
-                    .fg(Color::Black)
-                    .bg(Color::White)
-                )
-                .render(&mut f, chunks[0]);
+            draw_list(&mut f, chunks[0], &app_state);
             Block::default()
                 .title("info")
                 .borders(Borders::ALL)
@@ -58,4 +48,23 @@ fn main() -> Result<(), Error> {
     }
     app_state.persist()?;
     Ok(())
+}
+
+fn draw_list<B>(f: &mut Frame<B>, layout: Rect, app_state: &app_state::AppState)
+where
+    B: Backend,
+{
+    let items = app_state.to_string_list();
+    SelectableList::default()
+        .block(Block::default().title("TO-DO LIST").borders(Borders::ALL))
+        .items(&items)
+        .select(Some(app_state.get_selected_index()))
+        .style(Style::default().fg(Color::White))
+        .highlight_style(
+            Style::default()
+            .fg(Color::Black)
+            .bg(Color::White)
+        )
+        .render(f, layout);
+
 }
