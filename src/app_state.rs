@@ -1,3 +1,7 @@
+extern crate dirs;
+
+use std::fs;
+use std::io;
 use crate::todo::Todo;
 
 pub struct AppState {
@@ -34,10 +38,31 @@ impl AppState {
         }
     }
 
-    pub fn to_storage_content(&self) -> String {
+    pub fn to_string_list(&self) -> Vec<String> {
         self.todos.iter()
-                  .map(|todo| todo.to_storage_line())
+                  .map(|t| format!("{}", t))
                   .collect::<Vec<String>>()
-                  .join("\r\n")
+    }
+
+    pub fn load(&mut self) -> io::Result<()> {
+        let mut todo_file_path = dirs::config_dir().unwrap();
+        todo_file_path.push(".todo_list");
+        let content = fs::read_to_string(todo_file_path)?;
+        content.lines()
+               .map(|line| Todo::build_from_storage(line))
+               .for_each(|todo| self.add(todo));
+        Ok(())
+    }
+
+    pub fn persist (&self) -> io::Result<()> {
+        let content = self.todos
+                          .iter()
+                          .map(|t| t.to_storage_line())
+                          .collect::<Vec<String>>()
+                          .join("\r\n");
+        let mut todo_file_path = dirs::config_dir().unwrap();
+        todo_file_path.push(".todo_list");
+        fs::write(todo_file_path, content)?;
+        Ok(())
     }
 }
