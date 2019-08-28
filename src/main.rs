@@ -28,25 +28,31 @@ fn main() -> Result<(), Error> {
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
     terminal.hide_cursor()?;
+    draw(&mut terminal, &app_state)?;
     for k in stdin.keys() {
         if let Ok(Key::Char('q')) = k { break };
         app_state.handle_event(k.unwrap());
-        terminal.draw(|mut f| {
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([
-                    Constraint::Percentage(80),
-                    Constraint::Percentage(20)
-                ].as_ref())
-                .split(f.size());
-            draw_list(&mut f, chunks[0], &app_state);
-            Block::default()
-                .title("info")
-                .borders(Borders::ALL)
-                .render(&mut f, chunks[1]);
-        })?;
+        draw(&mut terminal, &app_state)?;
     }
     app_state.persist()?;
+    Ok(())
+}
+
+fn draw<B>(terminal: &mut Terminal<B>, app_state: &app_state::AppState) -> Result<(), Error>
+where
+    B: Backend,
+{
+    terminal.draw(|mut f| {
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(80),
+                Constraint::Percentage(20)
+            ].as_ref())
+            .split(f.size());
+        draw_list(&mut f, chunks[0], &app_state);
+        draw_info_block(&mut f, chunks[1]);
+    })?;
     Ok(())
 }
 
@@ -56,7 +62,11 @@ where
 {
     let items = app_state.to_string_list();
     SelectableList::default()
-        .block(Block::default().title("TO-DO LIST").borders(Borders::ALL))
+        .block(
+            Block::default()
+            .title("TO-DO LIST")
+            .borders(Borders::ALL)
+        )
         .items(&items)
         .select(Some(app_state.get_selected_index()))
         .style(Style::default().fg(Color::White))
@@ -66,5 +76,14 @@ where
             .bg(Color::White)
         )
         .render(f, layout);
+}
 
+fn draw_info_block<B>(f: &mut Frame<B>, layout: Rect)
+where
+    B: Backend,
+{
+    Block::default()
+        .title("info")
+        .borders(Borders::ALL)
+        .render(f, layout);
 }
