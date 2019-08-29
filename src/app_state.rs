@@ -27,6 +27,10 @@ impl AppState {
         self.todos[self.selected_index] = todo;
     }
 
+    fn delete_selected_todo(&mut self) {
+        self.todos.remove(self.selected_index);
+    }
+
     fn select_previous_todo(&mut self) {
         if self.selected_index < (self.todos.len() - 1) {
             self.selected_index += 1;
@@ -76,6 +80,7 @@ impl AppState {
             Key::Char('j') => self.select_previous_todo(),
             Key::Char('k') => self.select_next_todo(),
             Key::Char('t') => self.toggle_selected_todo(),
+            Key::Char('d') => self.delete_selected_todo(),
             _ => {}
         }
     }
