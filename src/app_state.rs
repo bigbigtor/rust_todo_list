@@ -5,9 +5,15 @@ use std::io;
 use termion::event::Key;
 use crate::todo::Todo;
 
+enum Mode {
+    Normal,
+    Insert,
+}
+
 pub struct AppState {
     todos: Vec<Todo>,
     selected_index: usize,
+    mode: Mode,
 }
 
 impl AppState {
@@ -15,11 +21,13 @@ impl AppState {
         AppState {
             todos: Vec::new(),
             selected_index: 0,
+            mode: Mode::Normal,
         }
     }
 
-    pub fn add(&mut self, todo: Todo) {
-        self.todos.push(todo);
+    pub fn add(&mut self, idx: usize) {
+        let todo = Todo::new(String::new(), false);
+        self.todos.insert(idx, todo);
     }
 
     fn toggle_selected_todo(&mut self) {
@@ -59,7 +67,7 @@ impl AppState {
         let content = fs::read_to_string(todo_file_path)?;
         content.lines()
                .map(|line| Todo::build_from_storage(line))
-               .for_each(|todo| self.add(todo));
+               .for_each(|todo| self.todos.push(todo));
         Ok(())
     }
 
@@ -76,12 +84,31 @@ impl AppState {
     }
 
     pub fn handle_event(&mut self, key: Key) {
-        match key {
-            Key::Char('j') => self.select_previous_todo(),
-            Key::Char('k') => self.select_next_todo(),
-            Key::Char('t') => self.toggle_selected_todo(),
-            Key::Char('d') => self.delete_selected_todo(),
-            _ => {}
+        match self.mode {
+            Mode::Normal => {
+                match key {
+                    Key::Char('j') => self.select_previous_todo(),
+                    Key::Char('k') => self.select_next_todo(),
+                    Key::Char('t') => self.toggle_selected_todo(),
+                    Key::Char('d') => self.delete_selected_todo(),
+                    Key::Char('i') => {
+                        self.add(self.selected_index);
+                        self.mode = Mode::Insert;
+                    },
+                    Key::Char('a') => {
+                        self.selected_index += 1;
+                        self.add(self.selected_index);
+                        self.mode = Mode::Insert;
+                    },
+                    _ => {}
+                }
+            },
+            Mode::Insert => {
+                match key {
+                    Key::Esc       => self.mode = Mode::Normal,
+                    _ => {}
+                }
+            },
         }
     }
 
