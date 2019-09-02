@@ -14,11 +14,12 @@ impl Todo {
         }
     }
 
-    pub fn toggle_complete(&self) -> Todo {
-        Todo {
-            description: self.description.to_owned(),
-            completed: !self.completed,
-        }
+    pub fn description_mut(&mut self) -> &mut String {
+        &mut self.description
+    }
+
+    pub fn toggle_complete(&mut self) {
+        self.completed = !self.completed;
     }
 
     pub fn build_from_storage(line: &str) -> Todo {

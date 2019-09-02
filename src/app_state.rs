@@ -5,15 +5,16 @@ use std::io;
 use termion::event::Key;
 use crate::todo::Todo;
 
-enum Mode {
+#[derive(PartialEq, Debug)]
+pub enum Mode {
     Normal,
     Insert,
 }
 
 pub struct AppState {
-    todos: Vec<Todo>,
-    selected_index: usize,
-    mode: Mode,
+    pub todos: Vec<Todo>,
+    pub selected_index: usize,
+    pub mode: Mode,
 }
 
 impl AppState {
@@ -31,8 +32,7 @@ impl AppState {
     }
 
     fn toggle_selected_todo(&mut self) {
-        let todo = self.todos[self.selected_index].toggle_complete();
-        self.todos[self.selected_index] = todo;
+        self.todos[self.selected_index].toggle_complete();
     }
 
     fn delete_selected_todo(&mut self) {
@@ -49,16 +49,6 @@ impl AppState {
         if 0 < self.selected_index {
             self.selected_index -= 1;
         }
-    }
-
-    pub fn to_string_list(&self) -> Vec<String> {
-        self.todos.iter()
-                  .map(|t| format!("{}", t))
-                  .collect::<Vec<String>>()
-    }
-
-    pub fn get_selected_index(&self) -> usize {
-        self.selected_index
     }
 
     pub fn load(&mut self) -> io::Result<()> {
@@ -105,7 +95,17 @@ impl AppState {
             },
             Mode::Insert => {
                 match key {
-                    Key::Esc       => self.mode = Mode::Normal,
+                    Key::Esc => self.mode = Mode::Normal,
+                    Key::Char(c) => {
+                        self.todos[self.selected_index]
+                            .description_mut()
+                            .push(c);
+                    },
+                    Key::Backspace => {
+                        self.todos[self.selected_index]
+                            .description_mut()
+                            .pop();
+                    },
                     _ => {}
                 }
             },

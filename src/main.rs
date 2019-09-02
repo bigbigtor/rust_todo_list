@@ -11,7 +11,7 @@ use tui::{Terminal, Frame};
 use tui::backend::Backend;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::backend::TermionBackend;
-use tui::widgets::{Widget, Block, Borders, SelectableList};
+use tui::widgets::{Widget, Block, Borders, SelectableList, Paragraph, Text};
 use tui::style::*;
 
 mod todo;
@@ -28,9 +28,18 @@ fn main() -> Result<(), Error> {
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
     terminal.hide_cursor()?;
+    terminal.autoresize()?;
     draw(&mut terminal, &app_state)?;
     for k in stdin.keys() {
-        if let Ok(Key::Char('q')) = k { break };
+        match app_state.mode {
+            app_state::Mode::Normal => {
+                if let Ok(Key::Char('q')) = k { break };
+                terminal.hide_cursor()?;
+            },
+            app_state::Mode::Insert => {
+                terminal.show_cursor()?;
+            },
+        }
         app_state.handle_event(k.unwrap());
         draw(&mut terminal, &app_state)?;
     }
@@ -46,12 +55,12 @@ where
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Percentage(80),
-                Constraint::Percentage(20)
+                Constraint::Percentage(98),
+                Constraint::Min(2),
             ].as_ref())
             .split(f.size());
         draw_list(&mut f, chunks[0], &app_state);
-        draw_info_block(&mut f, chunks[1]);
+        draw_info_block(&mut f, chunks[1], &app_state);
     })?;
     Ok(())
 }
@@ -60,7 +69,11 @@ fn draw_list<B>(f: &mut Frame<B>, layout: Rect, app_state: &app_state::AppState)
 where
     B: Backend,
 {
-    let items = app_state.to_string_list();
+    let items = app_state.todos
+                         .iter()
+                         .map(|t| format!("{}", t))
+                         .collect::<Vec<String>>();
+
     SelectableList::default()
         .block(
             Block::default()
@@ -68,7 +81,7 @@ where
             .borders(Borders::ALL)
         )
         .items(&items)
-        .select(Some(app_state.get_selected_index()))
+        .select(Some(app_state.selected_index))
         .style(Style::default().fg(Color::White))
         .highlight_style(
             Style::default()
@@ -78,12 +91,18 @@ where
         .render(f, layout);
 }
 
-fn draw_info_block<B>(f: &mut Frame<B>, layout: Rect)
+fn draw_info_block<B>(f: &mut Frame<B>, layout: Rect, app_state: &app_state::AppState)
 where
     B: Backend,
 {
-    Block::default()
-        .title("info")
-        .borders(Borders::ALL)
-        .render(f, layout);
+    let lines = [
+        Text::styled(
+            format!(" {:?} ", app_state.mode).to_uppercase(),
+            Style::default().fg(Color::Black).bg(Color::White).modifier(Modifier::BOLD)
+        ),
+        Text::raw(
+            " j: down, k: up, t: toggle, i: insert, a: append"
+        ),
+    ];
+    Paragraph::new(lines.iter()).render(f, layout);
 }
