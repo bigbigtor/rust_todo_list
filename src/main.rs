@@ -71,7 +71,7 @@ where
 {
     let items = app_state.todos
                          .iter()
-                         .map(|t| format!("{}", t))
+                         .map(|t| t.to_string())
                          .collect::<Vec<String>>();
 
     SelectableList::default()
