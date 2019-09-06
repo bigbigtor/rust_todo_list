@@ -101,7 +101,7 @@ where
             Style::default().fg(Color::Black).bg(Color::White).modifier(Modifier::BOLD)
         ),
         Text::raw(
-            " j: down, k: up, t: toggle, i: insert, a: append"
+            " j: down, k: up, t: toggle, i: insert, a: append, d: delete, c: change, ESC: NORMAL mode"
         ),
     ];
     Paragraph::new(lines.iter()).render(f, layout);

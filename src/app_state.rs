@@ -81,6 +81,7 @@ impl AppState {
                     Key::Char('k') => self.select_next_todo(),
                     Key::Char('t') => self.toggle_selected_todo(),
                     Key::Char('d') => self.delete_selected_todo(),
+                    Key::Char('c') => self.mode = Mode::Insert,
                     Key::Char('i') => {
                         self.add(self.selected_index);
                         self.mode = Mode::Insert;
