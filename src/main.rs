@@ -84,10 +84,9 @@ where
         .select(Some(app_state.selected_index))
         .style(Style::default().fg(Color::White))
         .highlight_style(
-            Style::default()
-            .fg(Color::Black)
-            .bg(Color::White)
+            Style::default().modifier(Modifier::BOLD)
         )
+        .highlight_symbol(">>")
         .render(f, layout);
 }
 
